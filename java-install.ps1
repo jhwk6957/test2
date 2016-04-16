@@ -32,18 +32,9 @@ ForEach ($jdk in $jdksToUninstall) {
 	Start-Process MsiExec.exe -ArgumentList "/x $($jdk.IdentifyingNumber) /qn" -Wait
 }
 
-# remove old symbolic links
-#Write-Host "Removing old symbolic links..."
-#$links = @(Get-ChildItem $installDir | Where {$_.Attributes -match "ReparsePoint"})
-#ForEach ($link in $links) {
-#	Write-Host "  Removing: $link"
-#	cmd /c rmdir "$installDir\$link"
-#}
-
 # get list of JDKs to install
 Write-Host "Populating list of JDKs to install..."
 $jdksToInstall = Get-ChildItem "installers\$arch" | ForEach-Object { $_.Name -replace ".exe", "" }
-#jdksToInstall = Get-ChildItem "C:\Users\josh\workspace\testProject\installers\$arch\jdk.exe" | ForEach-Object { $_.Name -replace ".exe", "" }
 
 # install new version of JDK
 Write-Host "Installing JDKs..."
@@ -52,9 +43,6 @@ ForEach ($jdk in $jdksToInstall) {
 	Write-Host "  Installing JDK ($jdk) and JRE ($jre)"
 	Start-Process installers\$arch\$jdk.exe -arg "/s ADDLOCAL=`"ToolsFeature,SourceFeature,PublicjreFeature`" INSTALLDIR=`"$installDir\$jdk`" /INSTALLDIRPUBJRE=`"$installDir\$jre`" /L C:\Temp\$jdk-install.log" -Wait
 
-#	Write-Host "  Updating policy files and cacerts for JDK ($jdk) and JRE ($jre)"
-#	Copy-Item "patches\$jdk\*" "$installDir\$jdk" -Force -Recurse
-#	Copy-Item "patches\$jdk\jre\*" "$installDir\$jre" -Force -Recurse
 }
 
 # create symbolic link to preferred JDK
